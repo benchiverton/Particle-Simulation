@@ -47,6 +47,7 @@ public class Renderer {
 		
 		glColor3f(1.0f,1.0f,1.0f);
 		
+		//Makes the camera pan around the simulation if the variable spin is 'true'.
 		if(spin == true){
 			angleA += 0.002;
 		}
@@ -56,7 +57,8 @@ public class Renderer {
 		
 		cosB = Math.cos(angleB);
 		sinB = Math.sin(angleB);
-		
+
+		//Draws the axis if the variable axis is 'true'.
 		pointA = 0.95;
 		pointB = 0.05;
 		
@@ -94,28 +96,40 @@ public class Renderer {
 	 * @param i   The size of the universe
 	 */
 	public static void renderParticle(int i){
+		//Calculates the x, y and z value at which the particle will be rendered
 		double x = (Simulation.u.getParticles().get(i).getPosition().getComponent(0)-0.5)*2;
 		double y = (Simulation.u.getParticles().get(i).getPosition().getComponent(1)-0.5)*2;
 		double z = 0;
+		
+		//If there are more than 2 dimensions, ie - if the particles have a z-value, calculates the z-value at which the particle will be rendered
 		if(Simulation.dimension>2){
 			z = (Simulation.u.getParticles().get(i).getPosition().getComponent(2)-0.5)*2;
 		}
 		
 		double scale = SCALE;
 		
+		//Calculates the point which you 'view' the simulation from, and puts it into a vector
 		double[] viewpointXYZ = {-sinA*cosB/zoom, -sinB/zoom, -cosA*cosB/zoom};
 		Vector viewpoint = new Vector(3, viewpointXYZ);
-		
+		//Puts the XYZ position of the particle into a new vector
 		double[] positionXYZ = {x,y,z};
 		Vector position = new Vector(3, positionXYZ);
+		//Calculates the distance the particle is from the viewpoint
 		double distFromVP = position.distance(viewpoint);
+		
 		
 		glColor3f(1.0f, 1.0f, 1.0f);
 			
+		//Changes the size of the rendered particle given it's distance to the 'camera' is the variable sizing is 'true'
 		if(sizing==true){
 			scale = scale * Math.cbrt(Simulation.u.getParticles().get(i).getMass() / distFromVP);
 		}
 		
+		/*
+		 * Draws each particle as a cube, individually rendering each side.
+		 * This is incredibly inefficient, and completely un-necessary given that there is a function in lwjgl which automatically does this...
+		 * However it works and is fun! So I decided to keep it - probably just to make myself feel better about calculating all the matrices by hand.
+		 */
 		double xZoomP = x * zoom + scale;
 		double xZoomM = x * zoom - scale;
 		double yZoomP = y * zoom + scale;
@@ -164,7 +178,10 @@ public class Renderer {
 		glVertex3d(xApm, yZoomM*cosB-zApm*sinB, yZoomP*sinB+zApm*cosB);
 		glVertex3d(xApp, yZoomM*cosB-zApp*sinB, yZoomP*sinB+zApp*cosB);
 		
-		//This doesn't look as pretty with the lighting :(
+		/*
+		 * Does the same as above, but renders only the x and y co-ordinate.
+		 * However this doesn't look as nice with the lighting, so I decided to use the code above.
+		 */
 /*		
 		GL11.glBegin(GL11.GL_QUADS);
 	    //back
@@ -200,6 +217,7 @@ public class Renderer {
 */	
 	}
 	
+	//sets up the lighting used in the simulation
 	public static void setupLighting(){
 		float lightAmbient[] = { 0.5f, 0.5f, 0.5f, 1.0f };	//sets ambient light
 		float lightDiffuse[] = { 1f, 1f, 1f, 1.0f };		//sets light type to (1, 1, 1)
@@ -213,6 +231,7 @@ public class Renderer {
 		GL11.glEnable ( GL11.GL_LIGHTING );
 	}
 	
+	//Converts a float to a ByteBuffer
 	private static ByteBuffer asByteBuffer(float[] x){
 		ByteBuffer byteBuf = ByteBuffer.allocateDirect(x.length * Float.BYTES); //4 bytes per float
 		byteBuf.order(ByteOrder.nativeOrder());
@@ -222,24 +241,31 @@ public class Renderer {
 		return byteBuf;
 	}
 	
+	//Increases the value of angleA
 	public static void increaseAngleA(double angle){
 		angleA = angleA + angle;
 	}
+	
+	//Increases the value of angleB
+	public static void increaseAngleB(double angle){
+		angleB = angleB + angle;
+	}
+	
+		//Increases how 'close' the center of the 'axis' is
+	public static void increaseZoom(double increment){
+		zoom = zoom*increment;
+	}
+	
+	/*
+	 * getters and setters for various variables
+	 */
 	
 	public double getAngleA(){
 		return angleA;
 	}
 	
-	public static void increaseAngleB(double angle){
-		angleB = angleB + angle;
-	}
-	
 	public double getAngleB(){
 		return angleB;
-	}
-	
-	public static void increaseZoom(double increment){
-		zoom = zoom*increment;
 	}
 	
 	public double getZoom(){

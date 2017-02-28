@@ -22,10 +22,21 @@ public class Simulation
 	// The window used to show the simulation
 	private long window;
 	
+	//the dimension of the simulation
 	public static int dimension = 3;
+	//enable/disable lighting in the simulation
 	private static boolean lighting = true;
+	/*
+	 * If enabled, instead of generating particles in random positions, generates 2 particles
+	 * with initial positions/velocities such that they 'chase' eachother.
+	 * 
+	 * NOTE - if you increase the timebase, they do seperate.. this is not a fault of the 
+	 * program/initial positions/velocities, but because my program only allows particles to travel
+	 * in 'straight lines' after each loop, and so they travel along a tangent of their true path
+	 * every update, hence moving them further apart.
+	 */
 	private static boolean system = false;
-	
+	//How many particles are to be rendered in after each time interval
 	public static int particleCount = 500;
 	
 	//Width and height of the window
@@ -39,6 +50,7 @@ public class Simulation
 
 	}
 
+	//Starts the simulation, once it is finished it destroys the window
 	public void run()
 	{
 		System.out.println("Starting simulation...");
@@ -56,6 +68,12 @@ public class Simulation
 		}
 	}
 
+	/*
+	 * Calls Generate(), then calls setupLighting() if the variable lighting is 'true'.
+	 * It then draws the axis, and renders each particle.
+	 * It then updates the universe.
+	 * It then polls the events, invoking the keyCallback.
+	 */
 	private void loop()
 	{
 		Generate();
@@ -85,19 +103,21 @@ public class Simulation
 				
 				glEnd();
 					
-					///////////////////
+				///////////////////
 
-					glfwSwapBuffers(window); // swap the color buffers
+				glfwSwapBuffers(window); // swap the color buffers
 
-					u.updateUniverse(dimension);
+				u.updateUniverse(dimension);
 					
-					// Poll for window events. The key callback above will only be
-					// invoked during this call.
-					glfwPollEvents();
-				}	
+				// Poll for window events. The key callback above will only be
+				// invoked during this call.
+				glfwPollEvents();
+				
+			}	
 		}
 	}
 
+	//Creates a new universe, makes the window, and sets up the key callback
 	private void Generate()
 	{
 		u = new Universe(particleCount, dimension, system);
@@ -123,8 +143,22 @@ public class Simulation
 		if (window == NULL)
 			throw new RuntimeException("Failed to create the GLFW window");
 
-		// Setup a key callback. It will be called every time a key is pressed,
-		// repeated or released.
+		/*
+		 * Setup a key callback. It will be called every time a key is pressed,
+		 * repeated or released.
+		 * 
+		 * reference:
+		 * P = increase timebase (speed up)
+		 * O = decrease timebase (slow down)
+		 * UP = pan the camera upwards
+		 * DOWN = pan the camera downwards
+		 * LEFT = pan the camera left
+		 * RIGHT = pan the camera right
+		 * M = increase zoom (zoom in)
+		 * N = decrease zoom (zoom out)
+		 * SPACE = reset camera to original position and resets zoom
+		 * Q = toggle axis on/off
+		 */
 		glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback()
 		{
 			@Override
@@ -153,12 +187,12 @@ public class Simulation
 					Renderer.increaseAngleB(-0.01);
 				}
 				
-				if(key == GLFW_KEY_RIGHT)
+				if(key == GLFW_KEY_LEFT)
 				{
 					Renderer.increaseAngleA(0.01);
 				}	
 				
-				if(key == GLFW_KEY_LEFT)
+				if(key == GLFW_KEY_RIGHT)
 				{
 					Renderer.increaseAngleA(-0.01);
 				}
@@ -191,11 +225,13 @@ public class Simulation
 
 		// Get the resolution of the primary monitor
 		GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-		// Center our window
+		
+		// Center the window
 		glfwSetWindowPos(window, (vidmode.width() - WIDTH) / 2, (vidmode.height() - HEIGHT) / 2);
 
 		// Make the OpenGL context current
 		glfwMakeContextCurrent(window);
+		
 		// Enable v-sync
 		glfwSwapInterval(1);
 
