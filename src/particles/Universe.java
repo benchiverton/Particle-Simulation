@@ -3,7 +3,6 @@ package particles;
 import java.util.ArrayList;
 
 import vectors.Vector;
-import vectors.Vector2D;
 import visual.Renderer;
 
 public class Universe

@@ -27,13 +27,13 @@ public class Simulation
 	//enable/disable lighting in the simulation
 	private static boolean lighting = true;
 	/*
-	 * If enabled, instead of generating particles in random positions, generates 2 particles
+	 * If true, instead of generating particles in random positions, generates 2 particles
 	 * with initial positions/velocities such that they 'chase' eachother.
 	 * 
-	 * NOTE - if you increase the timebase, they do seperate.. this is not a fault of the 
-	 * program/initial positions/velocities, but because my program only allows particles to travel
-	 * in 'straight lines' after each loop, and so they travel along a tangent of their true path
-	 * every update, hence moving them further apart.
+	 * NOTE - if you increase the timebase, they do seperate... this is not a fault of the 
+	 * initial positions/velocities, but because my program only allows particles to travel
+	 * in 'straight lines' after each loop, and so they travel along a tangent of their true path,
+	 * hence moving them slightly further apart after every update.
 	 */
 	private static boolean system = false;
 	//How many particles are to be rendered in after each time interval
